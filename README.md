@@ -10,14 +10,14 @@ Official implementation of paper 'Fair Feature Distillation for Visual Recogniti
 
 #### 1) Download dataset
 
-- UTKFACE : link
+- UTKFACE : [link](https://susanqq.github.io/UTKFace/) (We used Aligned&Cropped Faces from the site)
 - CelebA : link
 
 #### 2) Execution command
 You should first train a scratch model used as a teacher.
 ```
 # Cifar10
-$ python3 ./main.py --method scratch --dataset cifar10 --model cifar_net --epochs 50 --img-size 176 --batch-size 128 --optimizer ADAM --lr 0.001 --date 210525
+$ python3 ./main.py --method scratch --dataset cifar10 --model cifar_net --epochs 50 --img-size 32 --batch-size 128 --optimizer ADAM --lr 0.001 --date 210525
 
 # UTKFACE
 $ python3 ./main.py --method scratch --dataset utkface --model resnet18 --epochs 50 --img-size 176 --batch-size 128 --optimizer ADAM --lr 0.001 --date 210525
@@ -29,7 +29,7 @@ $ python3 ./main.py --method scratch --dataset celeba --model shufflenet --epoch
 Then, using the saved teacher model, you can train a student model via MFD algorithm.
 ```
 # Cifar10
-$ python3 ./main.py --method kd_mfd --dataset cifar10 --model cifar_net --epochs 50 --labelwise --lambf 3 --img-size 176 --batch-size 128 --optimizer ADAM --lr 0.001 --modelpath trained_models/210525/cifar10/scratch/cifar_net_seed0_epochs50_bs128_lr0.001.pt
+$ python3 ./main.py --method kd_mfd --dataset cifar10 --model cifar_net --epochs 50 --labelwise --lambf 3 --img-size 32 --batch-size 128 --optimizer ADAM --lr 0.001 --modelpath trained_models/210525/cifar10/scratch/cifar_net_seed0_epochs50_bs128_lr0.001.pt
 
 # UTKFACE
 $ python3 ./main.py --method kd_mfd --dataset utkface --model resnet18 --epochs 50 --labelwise --lambf 3 --img-size 176 --batch-size 128 --optimizer ADAM --lr 0.001 --modelpath trained_models/210525/utkface/scratch/resnet18_seed0_epochs50_bs128_lr0.001.pt
