@@ -134,7 +134,6 @@ class ShuffleNetV2(nn.Module):
         out = self.fc(h1)
         if get_inter:
             return h, out
-
         else:
             return out
 

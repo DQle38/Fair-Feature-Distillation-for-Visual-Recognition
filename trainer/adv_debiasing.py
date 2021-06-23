@@ -18,7 +18,6 @@ class Trainer(trainer.GenericTrainer):
         super().__init__(args=args, **kwargs)
         self.lambh = args.lambh
         self.lambf = args.lambf
-        self.convexlamb = args.convexlamb
         self.kd_temp = args.kd_temp
         self.teacher = teacher
 
@@ -98,12 +97,7 @@ class Trainer(trainer.GenericTrainer):
                 adv_loss += self.adv_criterion(adv_preds, groups[labels==c])
 
             loss = self.criterion(outputs, labels)
-
-            if self.convexlamb:
-                loss = loss / (1 + self.lambh) + self.lambh * kd_loss / (1 + self.lambh)
-            else:
-                loss = loss + self.lambh * kd_loss
-
+            loss = loss + self.lambh * kd_loss
             loss = loss + self.lambf * feature_loss
 
             running_loss += loss.item()

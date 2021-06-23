@@ -113,7 +113,7 @@ class ResNet(nn.Module):
 
     def __init__(self, block, layers, num_classes=1000, zero_init_residual=False,
                  groups=1, width_per_group=64, replace_stride_with_dilation=None,
-                 norm_layer=None, hydra=False, num_groups=None):
+                 norm_layer=None):
         super(ResNet, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
@@ -143,12 +143,8 @@ class ResNet(nn.Module):
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2,
                                        dilate=replace_stride_with_dilation[2])
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        if not hydra:
-            self.fc = nn.Linear(512 * block.expansion, num_classes)
-        else:
-            self.fc = nn.ModuleList()
-            for _ in range(num_groups):
-                self.fc.append(torch.nn.Linear(512 * block.expansion, num_classes))
+        self.fc = nn.Linear(512 * block.expansion, num_classes)
+
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -191,7 +187,7 @@ class ResNet(nn.Module):
 
         return nn.Sequential(*layers)
 
-    def _forward_impl(self, x, get_inter=False, reid = False):
+    def _forward_impl(self, x, get_inter=False):
         # See note [TorchScript super()]
         h = self.conv1(x)
         h = self.bn1(h)
@@ -204,23 +200,16 @@ class ResNet(nn.Module):
         b4 = self.layer4(b3)
 
         h = self.avgpool(b4)
-        h1 = torch.flatten(h, 1)
-        if isinstance(self.fc, nn.ModuleList):
-            h = []
-            for i in range(len(self.fc)):
-                h.append(self.fc[i](h1))
-        else:
-            h = self.fc(h1)
+        h = torch.flatten(h, 1)
+        h = self.fc(h)
 
         if get_inter:
             return b1, b2, b3, b4, h
-        elif reid:
-            return h1
         else:
             return h
 
-    def forward(self, x, get_inter=False, reid=False):
-        return self._forward_impl(x, get_inter, reid)
+    def forward(self, x, get_inter=False):
+        return self._forward_impl(x, get_inter)
 
 
 def _resnet(arch, block, layers, pretrained, progress, **kwargs):

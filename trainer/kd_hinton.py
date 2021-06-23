@@ -12,7 +12,6 @@ class Trainer(trainer.GenericTrainer):
         self.kd_temp = args.kd_temp
         self.seed = args.seed
         self.no_annealing = args.no_annealing
-        self.convexlamb = args.convexlamb
 
     def train(self, train_loader, test_loader, epochs):
 
@@ -58,10 +57,7 @@ class Trainer(trainer.GenericTrainer):
             t_outputs = teacher(t_inputs)
             kd_loss = compute_hinton_loss(outputs, t_outputs, kd_temp=self.kd_temp, device=self.device)
 
-            if self.convexlamb:
-                loss = self.criterion(outputs, labels)/(1+self.lambh) + self.lambh * kd_loss/ (1+self.lambh)
-            else:
-                loss = self.criterion(outputs, labels) + self.lambh * kd_loss
+            loss = self.criterion(outputs, labels) + self.lambh * kd_loss
 
             running_loss += loss.item()
             running_acc += get_accuracy(outputs, labels)

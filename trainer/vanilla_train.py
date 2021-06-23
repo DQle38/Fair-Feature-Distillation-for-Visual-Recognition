@@ -10,7 +10,6 @@ class Trainer(trainer.GenericTrainer):
         super().__init__(args=args, **kwargs)
 
     def train(self, train_loader, test_loader, epochs):
-        global loss_set
         model = self.model
         model.train()
 

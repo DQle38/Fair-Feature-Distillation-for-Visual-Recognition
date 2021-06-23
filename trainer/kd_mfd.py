@@ -70,11 +70,7 @@ class Trainer(hinton_Trainer):
                                           kd_temp=self.kd_temp, device=self.device) if self.lambh != 0 else 0
 
             loss = self.criterion(stu_logits, labels)
-
-            if self.convexlamb:
-                loss = loss / (1 + self.lambh) + self.lambh * kd_loss / (1 + self.lambh)
-            else:
-                loss = loss + self.lambh * kd_loss
+            loss = loss + self.lambh * kd_loss
 
 
             f_s = outputs[-2]

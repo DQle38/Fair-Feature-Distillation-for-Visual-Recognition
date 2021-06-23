@@ -1,5 +1,5 @@
 import argparse
-
+import torch
 
 def get_args():
     parser = argparse.ArgumentParser(description='Fairness')
@@ -9,8 +9,11 @@ def get_args():
                         help='data directory (default: ./data/)')
     parser.add_argument('--save-dir', default='./trained_models/',
                         help='directory to save trained models (default: ./trained_models/)')
+    parser.add_argument('--no-cuda', action='store_true', default=False,
+                        help='disables CUDA training')
     parser.add_argument('--device', default=0, type=int, help='cuda device number')
     parser.add_argument('--t-device', default=0, type=int, help='teacher cuda device number')
+
 
     parser.add_argument('--mode', default='train', choices=['train', 'eval'])
     parser.add_argument('--modelpath', default=None)
@@ -24,7 +27,7 @@ def get_args():
     parser.add_argument('--epochs', default=50, type=int, help='number of training epochs')
     parser.add_argument('--batch-size', default=128, type=int, help='mini batch size')
     parser.add_argument('--seed', default=0, type=int, help='seed for randomness')
-    parser.add_argument('--date', default='20200101', type=str, help='experiment date')
+    parser.add_argument('--date', default='20xxxxxx', type=str, help='experiment date')
     parser.add_argument('--method', default='scratch', type=str, required=True,
                         choices=['scratch', 'kd_hinton', 'kd_fitnet', 'kd_at',
                                  'kd_mfd', 'scratch_mmd', 'kd_nst', 'adv_debiasing'])
@@ -48,7 +51,6 @@ def get_args():
     parser.add_argument('--target', default='Attractive', type=str, help='target attribute for celeba')
 
     parser.add_argument('--no-annealing', action='store_true', default=False, help='do not anneal lamb during training')
-    parser.add_argument('--convexlamb', action='store_true', default=False, help='lamb scale control')
     parser.add_argument('--fitnet-simul', default=False, action='store_true', help='no hint-training')
 
     parser.add_argument('--eta', default=0.0003, type=float, help='adversary training learning rate')
@@ -62,13 +64,12 @@ def get_args():
                         help='get penultimate features for TSNE visualization')
 
     args = parser.parse_args()
+    args.cuda = not args.no_cuda and torch.cuda.is_available()
     if args.mode == 'train' and (args.method.startswith('kd')):
-        if args.teacher_type is None:
-            raise Exception('A teacher model needs to be specified for distillation')
-        elif args.teacher_path is None:
+        if args.teacher_path is None:
             raise Exception('A teacher model path is not specified.')
 
-    if args.mode == 'eval' and args.modelpath is None:
+    if args.mode == 'eval' and args.model_path is None:
         raise Exception('Model path to load is not specified!')
     
     return args

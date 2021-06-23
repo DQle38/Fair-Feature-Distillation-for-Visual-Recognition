@@ -43,8 +43,7 @@ def main():
     
     ########################## get model ##################################
 
-    model = networks.ModelFactory.get_model(args.model, num_classes, args.img_size,
-                                            pretrained=args.pretrained, num_groups=num_groups)
+    model = networks.ModelFactory.get_model(args.model, num_classes, args.img_size, pretrained=args.pretrained)
 
     if args.parallel:
         model = nn.DataParallel(model)
@@ -56,7 +55,7 @@ def main():
 
     teacher = None
     if (args.method.startswith('kd') or args.teacher_path is not None) and args.mode != 'eval':
-        teacher = networks.ModelFactory.get_model(args.teacher_type, train_loader.dataset.num_classes, args.img_size)
+        teacher = networks.ModelFactory.get_model(args.model, train_loader.dataset.num_classes, args.img_size)
         if args.parallel:
             teacher = nn.DataParallel(teacher)
         teacher.load_state_dict(torch.load(args.teacher_path))

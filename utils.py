@@ -71,16 +71,15 @@ def make_log_name(args):
             log_name += '_{}'.format(args.kernel)
             log_name += '_sigma{}'.format(args.sigma) if args.kernel == 'rbf' else ''
             log_name += '_jointfeature' if args.jointfeature else ''
+            log_name += '_lambf{}'.format(args.lambf) if args.method == 'scratch_mmd' else ''
 
         if args.labelwise:
             log_name += '_labelwise'
 
         if args.teacher_path is not None:
             log_name += '_temp{}'.format(args.kd_temp)
-            log_name += '_convexlambh{}'.format(args.lambh) if args.convexlamb else '_lambh{}'.format(args.lambh)
-            log_name += '_lambf{}'.format(args.lambf)
+            log_name += '_lambh{}_lambf{}'.format(args.lambh, args.lambf)
 
-            log_name += '_from_{}'.format(args.teacher_type)
             if args.no_annealing:
                 log_name += '_fixedlamb'
         if args.dataset == 'celeba' and args.target != 'Attractive':

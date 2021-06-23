@@ -11,35 +11,28 @@ class MLP(nn.Module):
         except:
             in_features = feature_size  # if int
 
-        num_outputs = num_class
         self.adv = adv
         if self.adv:
             self.adv_lambda = adv_lambda
 
         self.num_layer = num_layer
 
-        self.fc = nn.ModuleList()
+        fc = []
+        in_dim = in_features
+        for i in range(num_layer-1):
+            fc.append(nn.Linear(in_dim, hidden_dim))
+            fc.append(nn.ReLU())
+            in_dim = hidden_dim
 
-        if num_layer == 1:
-            self.fc.append(nn.Linear(in_features, num_class))
-        else:
-            for i in range(num_layer):
-                if i == 0:
-                    self.fc.append(nn.Linear(in_features, hidden_dim))
-                elif i == (num_layer - 1):
-                    self.fc.append(nn.Linear(hidden_dim, num_outputs))
-                else:
-                    self.fc.append(nn.Linear(hidden_dim, hidden_dim))
+        fc.append(in_dim, num_class)
+        self.fc = nn.Sequential(*fc)
 
     def forward(self, feature):
         feature = torch.flatten(feature, 1)
         if self.adv:
             feature = ReverseLayerF.apply(feature, self.adv_lambda)
 
-        out = self.fc[0](feature)
-        for i in range(1, self.num_layer):
-            out = F.relu(out)
-            out = self.fc[i](out)
+        out = self.fc(feature)
 
         return out
 

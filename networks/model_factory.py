@@ -11,7 +11,7 @@ class ModelFactory():
         pass
 
     @staticmethod
-    def get_model(target_model, num_classes, img_size, pretrained=False, num_groups=2):
+    def get_model(target_model, num_classes, img_size, pretrained=False):
 
         if target_model == 'mlp': 
             return MLP(feature_size=img_size, hidden_dim=40, num_class=num_classes)
@@ -21,7 +21,7 @@ class ModelFactory():
                 model = resnet18(pretrained=True)
                 model.fc = nn.Linear(in_features=512, out_features=num_classes, bias=True)
             else:
-                model = resnet18(pretrained=False, num_classes=num_classes, num_groups=num_groups)
+                model = resnet18(pretrained=False, num_classes=num_classes)
             return model
 
         elif target_model == 'cifar_net':
